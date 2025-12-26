@@ -1,0 +1,356 @@
+openapi: 3.0.3
+
+info:
+  title: User API
+  version: "1.0"
+  description: >
+    Canonical public API v1.
+    JSON-only API using session-cookie authentication.
+    Infrastructure and dependency failures are normalized to 503.
+    Internal server errors (500) are intentionally not exposed.
+
+servers:
+  - url: /API/v1
+
+tags:
+  - name: auth
+    description: Authentication
+  - name: user
+    description: Current user profile
+
+paths:
+
+  /register:
+    post:
+      tags: [ auth ]
+      summary: Register a new user
+      description: >
+        Creates a new user account.
+        On success, no session is created automatically.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestRegister'
+      responses:
+        "200":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseOK'
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                email_taken:
+                  value:
+                    ok: false
+                    errors:
+                      email: Email is taken
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                email_invalid:
+                  value:
+                    ok: false
+                    errors:
+                      email: Email is invalid
+        "503":
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                infra_issues:
+                  value:
+                    ok: false
+                    errors:
+                      system: Service temporarily unavailable
+
+  /login:
+    post:
+      tags: [ auth ]
+      summary: Login
+      description: >
+        Authenticates user and establishes a session cookie.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestLogin'
+      responses:
+        "200":
+          description: Session established
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseOK'
+        "401":
+          description: Invalid Credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                invalid_credentials:
+                  value:
+                    ok: false
+                    errors:
+                      credentials: Invalid Credentials
+        "503":
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                infra_issues:
+                  value:
+                    ok: false
+                    errors:
+                      system: Service temporarily unavailable
+
+  /logout:
+    post:
+      tags: [ auth ]
+      summary: Logout
+      description: >
+        Destroys the current session.
+        Idempotent.
+      responses:
+        "200":
+          description: Session destroyed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseOK'
+
+  /me:
+    get:
+      tags: [ user ]
+      summary: Get current user profile
+      description: >
+        Returns the authenticated user's profile.
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseMe'
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                not_authenticated:
+                  value:
+                    ok: false
+                    errors:
+                      system: Not authenticated
+        "503":
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                infra_issues:
+                  value:
+                    ok: false
+                    errors:
+                      system: Service temporarily unavailable
+
+    put:
+      tags: [ user ]
+      summary: Update current user profile
+      description: >
+        Updates name, email, and date of birth.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestMeUpdate'
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseOK'
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                not_authenticated:
+                  value:
+                    ok: false
+                    errors:
+                      system: Not authenticated
+        "409":
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                email_taken:
+                  value:
+                    ok: false
+                    errors:
+                      email: Email is taken
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                email_is_invalid:
+                  value:
+                    ok: false
+                    errors:
+                      email: Email is invalid
+        "503":
+          description: Service temporarily unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseError'
+              examples:
+                infra_issues:
+                  value:
+                    ok: false
+                    errors:
+                      system: Service temporarily unavailable
+
+components:
+
+  schemas:
+
+    # ----------------------------
+    # Requests
+    # ----------------------------
+
+    RequestRegister:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - password_confirm
+        - date_of_birth
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 120
+        password:
+          type: string
+          minLength: 8
+        password_confirm:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
+          description: Must be a past date and age >= 18
+
+    RequestLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    RequestMeUpdate:
+      type: object
+      required:
+        - name
+        - email
+        - date_of_birth
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 120
+        date_of_birth:
+          type: string
+          format: date
+
+    # ----------------------------
+    # Responses
+    # ----------------------------
+
+    ResponseOK:
+      type: object
+      required: [ ok ]
+      properties:
+        ok:
+          type: boolean
+          example: true
+
+    ResponseError:
+      type: object
+      required: [ ok, errors ]
+      properties:
+        ok:
+          type: boolean
+          example: false
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+
+    ResponseMe:
+      type: object
+      required: [ ok, data ]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/ObjectMe'
+
+    ObjectMe:
+      type: object
+      required:
+        - name
+        - email
+        - date_of_birth
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        date_of_birth:
+          type: string
+          format: date

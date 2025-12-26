@@ -1,0 +1,30 @@
+# Disable directory listing
+Options -Indexes
+
+# Enable rewrite engine
+RewriteEngine On
+
+# ------------------------------------------------------------------
+# SECURITY HEADERS (minimal but correct)
+# ------------------------------------------------------------------
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "DENY"
+Header always set X-XSS-Protection "1; mode=block"
+
+# ------------------------------------------------------------------
+# API routing
+# ------------------------------------------------------------------
+# Route everything under /API to /API/index.php
+RewriteRule ^API/?$ API/index.php [L]
+RewriteRule ^API/(.+)$ API/index.php [L]
+
+# ------------------------------------------------------------------
+# SPA fallback
+# ------------------------------------------------------------------
+# If file or directory exists - serve it
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Otherwise serve SPA entrypoint
+RewriteRule ^ index.html [L]
