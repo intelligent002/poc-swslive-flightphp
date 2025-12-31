@@ -1,6 +1,6 @@
 <?php
 
-    use App\Models\Messages;
+    use App\Exceptions\ExceptionUserUnauthenticated;
 
     Flight::before(
         'start', function() {
@@ -12,21 +12,16 @@
 
     /**
      * @return string
+     * @throws ExceptionUserUnauthenticated
      */
     function requireAuth() : string
     {
         if ( empty( $_SESSION['user_id'] ) ) {
-            Flight::halt(
-                401,
-                json_encode(
-                    [
-                        'ok' => false,
-                        'errors' => [
-                            'system' => Messages::NOT_AUTHENTICATED,
-                        ],
-                    ]
-                )
-            );
+            throw new ExceptionUserUnauthenticated();
+//            Flight::jsonHalt(
+//                Response::error( [ 'system' => Messages::NOT_AUTHENTICATED ] ),
+//                401
+//            );
         }
 
         return (string) $_SESSION['user_id'];

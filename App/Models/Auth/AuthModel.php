@@ -11,11 +11,9 @@
     class AuthModel
     {
 
-
         /**
          * @param array $data
          * @return array
-         * @throws PDOException
          * @throws ExceptionInfra
          */
         public static function login( array $data ) : array
