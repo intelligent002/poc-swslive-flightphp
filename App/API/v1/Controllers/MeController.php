@@ -5,6 +5,7 @@
     use App\API\v1\Responses\Response;
     use App\Exceptions\ExceptionEmailTaken;
     use App\Exceptions\ExceptionInfra;
+    use App\Exceptions\ExceptionUserUnauthenticated;
     use App\Exceptions\ExceptionUserUnavailable;
     use App\Models\Me\MeModel;
     use Flight;
@@ -37,6 +38,7 @@
          * @return void
          * @throws ExceptionInfra
          * @throws ExceptionUserUnavailable
+         * @throws ExceptionUserUnauthenticated
          */
         public static function fetch() : void
         {
@@ -61,6 +63,7 @@
          * @return void
          * @throws ExceptionEmailTaken
          * @throws ExceptionInfra
+         * @throws ExceptionUserUnauthenticated
          */
         public static function update() : void
         {
@@ -69,7 +72,7 @@
 
             $result = MeModel::update( $uid, $data );
             if ( $result['ok'] ) {
-                Flight::json( Response::ok( $result['data'] ), 200 );
+                Flight::json( Response::ok( [] ), 200 );
             } else {
                 Flight::json( Response::error( $result['errors'] ), 422 );
             }
