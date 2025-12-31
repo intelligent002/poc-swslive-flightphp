@@ -26,7 +26,6 @@
             if ( $result['ok'] ) {
                 session_regenerate_id( true );
                 $_SESSION['user_id'] = $result['data']['id'];
-                $_SESSION['email'] = $result['data']['email'];
                 Flight::json( Response::ok( [] ), 200 );
             } else {
                 Flight::json( Response::error( $result['errors'] ), 401 );
