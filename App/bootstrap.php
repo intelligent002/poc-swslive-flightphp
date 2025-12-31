@@ -1,9 +1,17 @@
 <?php
 
-    require __DIR__ . '/../vendor/autoload.php';
-
+    use App\API\v1\Responses\ExceptionHandler;
     use App\Infra\DB;
     use App\Infra\PdoConnection;
+
+    require __DIR__ . '/../vendor/autoload.php';
+
+    Flight::map(
+        'error',
+        function( Throwable $e ) {
+            ExceptionHandler::handle( $e );
+        }
+    );
 
     $db_host = getenv( 'DB_HOST' );
     $db_name = getenv( 'DB_NAME' );
