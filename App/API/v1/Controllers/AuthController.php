@@ -26,9 +26,9 @@
             if ( $result['ok'] ) {
                 session_regenerate_id( true );
                 $_SESSION['user_id'] = $result['data']['id'];
-                Flight::json( Response::ok( [] ), 200 );
+                Flight::json( Response::OK( [] ), 200 );
             } else {
-                Flight::json( Response::error( $result['errors'] ), 401 );
+                Flight::json( Response::ERROR( $result['errors'] ), 401 );
             }
         }
 
@@ -40,6 +40,6 @@
         public static function logout() : void
         {
             session_destroy();
-            Flight::json( Response::ok( [] ), 200 );
+            Flight::json( Response::OK( [] ), 200 );
         }
     }

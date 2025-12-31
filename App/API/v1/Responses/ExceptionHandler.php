@@ -19,7 +19,7 @@
                 case $e instanceof ExceptionEmailTaken:
                     {
                         Flight::jsonHalt(
-                            Response::error( [ 'email' => Messages::EMAIL_IS_TAKEN ] ),
+                            Response::ERROR( [ 'email' => Messages::EMAIL_IS_TAKEN ] ),
                             409
                         );
                         break;
@@ -29,7 +29,7 @@
                     {
                         session_destroy();
                         Flight::jsonHalt(
-                            Response::error( [ 'system' => Messages::USER_UNAVAILABLE ] ),
+                            Response::ERROR( [ 'system' => Messages::USER_UNAVAILABLE ] ),
                             401
                         );
                         break;
@@ -39,7 +39,7 @@
                     {
                         session_destroy();
                         Flight::jsonHalt(
-                            Response::error( [ 'system' => Messages::NOT_AUTHENTICATED ] ),
+                            Response::ERROR( [ 'system' => Messages::NOT_AUTHENTICATED ] ),
                             401
                         );
                         break;
@@ -47,7 +47,7 @@
                 case $e instanceof ExceptionInfra:
                     {
                         Flight::jsonHalt(
-                            Response::error( [ 'system' => Messages::GENERIC_ERROR ] ),
+                            Response::ERROR( [ 'system' => Messages::GENERIC_ERROR ] ),
                             503
                         );
                         break;

@@ -26,9 +26,9 @@
             );
 
             if ( $result['ok'] ) {
-                Flight::json( Response::ok( [] ), 200 );
+                Flight::json( Response::OK( [] ), 200 );
             } else {
-                Flight::json( Response::error( $result['errors'] ), 422 );
+                Flight::json( Response::ERROR( $result['errors'] ), 422 );
             }
         }
 
@@ -46,7 +46,7 @@
 
             $result = MeModel::fetch( $uid );
             Flight::json(
-                Response::ok(
+                Response::OK(
                     [
                         // opt-in required fields
                         "name" => $result['data']['name'],
@@ -72,9 +72,9 @@
 
             $result = MeModel::update( $uid, $data );
             if ( $result['ok'] ) {
-                Flight::json( Response::ok( [] ), 200 );
+                Flight::json( Response::OK( [] ), 200 );
             } else {
-                Flight::json( Response::error( $result['errors'] ), 422 );
+                Flight::json( Response::ERROR( $result['errors'] ), 422 );
             }
         }
     }
