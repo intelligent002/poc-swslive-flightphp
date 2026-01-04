@@ -4,12 +4,20 @@
 
     class Response
     {
-        public static function OK( mixed $content ) : array
+        /**
+         * @param mixed $content = []
+         * @return array
+         */
+        public static function OK( mixed $content = [] ) : array
         {
             return [ 'ok' => true, 'data' => $content ];
         }
 
-        public static function ERROR( mixed $content ) : array
+        /**
+         * @param mixed $content = []
+         * @return array
+         */
+        public static function ERROR( mixed $content = [] ) : array
         {
             return [ 'ok' => false, 'errors' => $content ];
 

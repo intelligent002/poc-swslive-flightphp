@@ -26,7 +26,7 @@
             );
 
             if ( $result['ok'] ) {
-                Flight::json( Response::OK( [] ), 200 );
+                Flight::json( Response::OK(), 200 );
             } else {
                 Flight::json( Response::ERROR( $result['errors'] ), 422 );
             }
@@ -72,7 +72,7 @@
 
             $result = MeModel::update( $uid, $data );
             if ( $result['ok'] ) {
-                Flight::json( Response::OK( [] ), 200 );
+                Flight::json( Response::OK(), 200 );
             } else {
                 Flight::json( Response::ERROR( $result['errors'] ), 422 );
             }
